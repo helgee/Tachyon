@@ -16,5 +16,8 @@ defmodule Tachyon do
       IO.puts File.cwd!()
       {:ok, pid} = Tachyon.JuliaWorker.start_link()
       Tachyon.JuliaWorker.println(pid, "BLOB")
+      |> IO.puts
+      Tachyon.JuliaWorker.println(pid, "Schlumpf")
+      |> IO.puts
   end
 end

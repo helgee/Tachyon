@@ -4,14 +4,14 @@ defmodule Tachyon.JuliaWorker do
     @default_nprocs :erlang.system_info(:logical_processors_available)
 
     def println(pid, line) do
-        GenServer.call(pid, {:println, line})
+        GenServer.call(pid, {:println, line}, 20000)
     end
 
     def start_link(opts \\ %{nprocs: @default_nprocs}) do
         GenServer.start_link(__MODULE__, opts)
     end
 
-    def init(opts) do
+    def init(_) do
         port = start_port()
         {:ok, %{port: port, next_id: 1, awaiting: %{}}}
     end
@@ -24,18 +24,22 @@ defmodule Tachyon.JuliaWorker do
     def handle_info({port, {:data, response}}, %{port: port} = state) do
         case String.split(response, ":", parts: 2) do
             [id, result] ->
-                id = Integer.parse(id)
+                {id, _} = Integer.parse(id)
+                result = String.strip(result)
                 case state.awaiting[id] do
                     nil -> {:noreply, state}
                     caller ->
-                        IO.puts caller
                         GenServer.reply(caller, result)
-                        {:noreply, %{state | awaiting: Map.delete(state.awaitng, id)}}
+                        {:noreply, %{state | awaiting: Map.delete(state.awaiting, id)}}
                 end
             [msg] ->
                 IO.puts msg
                 {:noreply, state}
         end
+    end
+
+    def terminate(reason, state) do
+        Port.close(state.port)
     end
 
     def handle_info({port, {:exit_status, status}}, %{port: port}) do
@@ -49,7 +53,7 @@ defmodule Tachyon.JuliaWorker do
     end
 
     defp command(id, line) do
-        "{\"id\":#{id}\"line\":\"#{line}\"}\n"
+        "{\"id\":#{id},\"line\":\"#{line}\"}\n"
     end
 
     defp send_request(state, line) do

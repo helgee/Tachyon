@@ -1,30 +1,16 @@
 using JSON
 
-# print("Julia is starting.")
-
-# @async begin
-    # while isopen(STDIN)
-    #     req = JSON.parse(readline(STDIN))
-    #     id = req["id"]
-    #     line = req["line"]
-    #     println("$id: $line")
-    #     flush(STDOUT)
-    # end
-# end
+print("Julia is starting.")
 
 try
-    while true
-        line = readline(STDIN)
-        # req = JSON.parse(readline(STDIN))
-        # id = req["id"]
-        # line = req["line"]
-        # print("$id: $line")
-        print(line)
-        print(line)
+    while !eof(STDIN)
+        buf = readavailable(STDIN)
+        req = JSON.parse(String(buf))
+        id = req["id"]
+        line = req["line"]
+        print("$id: $line")
     end
 catch err
-    println(err)
+    print(err)
     exit(1)
 end
-
-println("Julia is exiting.")
