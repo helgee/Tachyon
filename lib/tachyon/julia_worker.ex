@@ -49,7 +49,9 @@ defmodule Tachyon.JuliaWorker do
     end
 
     defp start_port do
-        Port.open({:spawn, "julia julia/worker.jl #{@default_nprocs}"}, [:binary])
+        path = System.find_executable("julia")
+        Port.open({:spawn_executable, path},
+            [:binary, args: ["julia/worker.jl", "#{@default_nprocs}"]])
     end
 
     defp command(id, line) do
