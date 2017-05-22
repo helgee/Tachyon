@@ -38,18 +38,18 @@ defmodule Tachyon.JuliaWorker do
         end
     end
 
-    def terminate(reason, state) do
-        Port.close(state.port)
-    end
-
     def handle_info({port, {:exit_status, status}}, %{port: port}) do
         :erlang.error({:port_exit, status})
     end
 
     def handle_info(_, state), do: {:noreply, state}
 
+    def terminate(_, state) do
+        Port.close(state.port)
+    end
+
     defp start_port do
-        Port.open({:spawn, "julia julia/worker.jl"}, [:binary])
+        Port.open({:spawn, "julia julia/worker.jl #{@default_nprocs}"}, [:binary])
     end
 
     defp command(id, line) do
