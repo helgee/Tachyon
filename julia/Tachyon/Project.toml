@@ -1,0 +1,7 @@
+name = "Tachyon"
+uuid = "00567408-2dbf-11e9-3885-93e2b285cc06"
+authors = ["Helge Eichhorn <git@helgeeichhorn.de>"]
+version = "0.1.0"
+
+[deps]
+Eterm = "31f415ca-2d2d-11e9-05ad-e37ee3ba8a1a"

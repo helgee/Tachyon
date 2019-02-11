@@ -13,10 +13,12 @@ defmodule Tachyon do
 
   """
   def run() do
-      {:ok, pid} = Tachyon.JuliaWorker.start_link()
-      Tachyon.JuliaWorker.println(pid, "BLOB")
-      |> IO.puts
-      Tachyon.JuliaWorker.println(pid, "Schlumpf")
-      |> IO.puts
+    {:ok, pid} = Tachyon.JuliaWorker.start_link()
+
+    Tachyon.JuliaWorker.call(pid, :println, ["BLOB"])
+    |> IO.puts()
+
+    Tachyon.JuliaWorker.call(pid, :println, ["Schlumpf"])
+    |> IO.puts()
   end
 end
